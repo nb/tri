@@ -3,6 +3,7 @@ const LINE_LENGTH_MIN = 20;
 const LINE_LENGTH_MAX = 50;
 const DELAY = 200;
 const MAX_ATTEMPTS = 1000000;
+const MAX_CONCAVE_FILL_LENGTH = 2 * LINE_LENGTH_MAX;
 
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -225,31 +226,37 @@ export function orderSegments(segments) {
   return ordered;
 }
 
-export function firstConcaveEdge(segments) {
-  let firstPlus = -1,
-    firstMinus = -1,
-    countPlus = 0,
+export function concaveEdges(segments) {
+  let countPlus = 0,
     countMinus = 0,
+    pluses = [],
+    minuses = [],
     j;
   for (let i = 0; i < segments.length; i++) {
     j = (i + 1) % segments.length;
     if (orientation(segments[i], segments[j][1]) > 0) {
-      countPlus++;
-      if (-1 === firstPlus) firstPlus = i;
+      pluses.push(i);
     } else {
-      countMinus++;
-      if (-1 === firstMinus) firstMinus = i;
+      minuses.push(i);
     }
   }
-  if (countPlus === 0 || countMinus === 0) {
-    return false;
+  if (pluses.length === 0 || minuses.length === 0) {
+    return [];
   }
-  if (countPlus > countMinus) {
-    return firstMinus;
-  } else if (countMinus > countPlus) {
-    return firstPlus;
+  // since we know that concave edges can't be more than
+  // convex ones, we can assume that the better represented
+  // population is that of convex edges
+  if (pluses.length > minuses.length) {
+    return minuses;
+  } else if (minuses.length > pluses.length) {
+    return pluses;
   } else {
-    throw "equal pluses and minuses :(";
+    // if they're equal we don't know which is which
+    // we can figure it out by calculating the convex hull,
+    // but it's a bit complex, so let's for now assume there
+    // are no concave edges and in few iterations the polygon
+    // will probably in a state where # of pluses and minuses differ
+    return [];
   }
 }
 
@@ -299,6 +306,22 @@ function next(segments) {
   if (shouldStop || attempts > MAX_ATTEMPTS) {
     return;
   }
+  // first fill any concave parts of the polygon, because it's easy
+  // we limit the length of a new segment, because once we have a long one
+  // the random point algorithm usually produces similar-sized triangle and
+  // then all the triangles become huge
+  const concaveIndices = concaveEdges(segments);
+  for (const concaveIndex of concaveIndices) {
+    const afterConcave = (concaveIndex + 1) % segments.length;
+    const segment = [segments[concaveIndex][0], segments[afterConcave][1]];
+    if (segmentLength(segment) <= MAX_CONCAVE_FILL_LENGTH) {
+      drawSegment(segment);
+      segments[concaveIndex][1] = segments[afterConcave][1];
+      segments.splice(afterConcave, 1);
+      setTimeout(() => next(segments), DELAY);
+      return;
+    }
+  }
   // random segment
   const segmentIndex = getRandomInt(0, segments.length);
   const startSegment = segments[segmentIndex];
@@ -308,19 +331,6 @@ function next(segments) {
       !doesNewTriangleOverlapWithPolygon(point, segmentIndex, segments)
     );
   });
-  if (false === newPoint) {
-    const firstConcave = firstConcaveEdge(segments);
-    if (false !== firstConcave) {
-      const afterConcave = (firstConcave + 1) % segments.length;
-      drawSegment([segments[firstConcave][0], segments[afterConcave][1]]);
-      segments[firstConcave][1] = segments[afterConcave][1];
-      segments.splice(afterConcave, 1);
-      setTimeout(() => next(segments), DELAY);
-      return;
-    }
-    setTimeout(() => next(segments), 0);
-    return;
-  }
   segments = replaceSideWithNewPoint(segmentIndex, newPoint, segments);
   setTimeout(() => next(segments), DELAY);
 }
