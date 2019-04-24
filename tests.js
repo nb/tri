@@ -1,6 +1,6 @@
 import {
   orderSegments,
-  firstConcaveEdge,
+  concaveEdges,
   doSegmentsCross,
   deepEqual
 } from "./tri.js";
@@ -81,7 +81,7 @@ function tests() {
   const firstConcaveEdgeTests = [
     [
       "it's convex",
-      false,
+      [],
       [
         [{ x: 300, y: 100 }, { x: 420, y: 10 }],
         [{ x: 420, y: 10 }, { x: 510, y: 220 }],
@@ -91,7 +91,7 @@ function tests() {
     ],
     [
       "last segment is concave",
-      3,
+      [3],
       [
         [{ x: 100, y: 100 }, { x: 0, y: 200 }],
         [{ x: 0, y: 200 }, { x: 0, y: 0 }],
@@ -107,7 +107,7 @@ function tests() {
     console.assert(deepEqual(test[2], orderSegments(test[1])), test[0])
   );
   firstConcaveEdgeTests.forEach(test =>
-    console.assert(deepEqual(test[1], firstConcaveEdge(test[2])), test[0])
+    console.assert(deepEqual(test[1], concaveEdges(test[2])), test[0])
   );
 }
 
