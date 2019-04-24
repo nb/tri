@@ -72,7 +72,7 @@ function randomPointCloseToASegment(segment, predicate = point => true) {
     pointAttempts++;
     if (pointAttempts > 100) return false;
     angle = Math.random() * 2 * Math.PI;
-    angle = ((70 + Math.random() * 40) / 180) * Math.PI + slopeAngle;
+    angle = ((30 + Math.random() * 90) / 180) * Math.PI + slopeAngle;
     offsetX = Math.cos(angle) * distance;
     offsetY = Math.sin(angle) * distance;
     newPoint = {
