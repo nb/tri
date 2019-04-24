@@ -182,6 +182,11 @@ function doSegmentsCross(segment0, segment1) {
   return false;
 }
 
+/**
+ * Orders a list of segments so that they now
+ * make a valid polygon – end of each segment is the start of the next
+ * @param {Array} segments
+ */
 function orderSegments(segments) {
   if (segments.length < 2) {
     return segments;
@@ -189,24 +194,23 @@ function orderSegments(segments) {
   const length = segments.length;
   const ordered = [];
   let current = segments[0][1];
-  let rotate;
+  let swap;
   let foundIndex;
   ordered.push(segments[0]);
   segments.shift();
   while (ordered.length < length) {
-    // find a segment starting with the current point
     foundIndex = false;
-    rotate = false;
+    swap = false;
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       if (deepEqual(segment[0], current)) {
         foundIndex = i;
-        rotate = false;
+        swap = false;
         break;
       }
       if (deepEqual(segment[1], current)) {
         foundIndex = i;
-        rotate = true;
+        swap = true;
         break;
       }
     }
@@ -214,7 +218,7 @@ function orderSegments(segments) {
       throw "Could not find a segment starting/ending with " +
         JSON.stringify(current);
     }
-    if (rotate) {
+    if (swap) {
       current = segments[foundIndex][0];
       ordered.push([segments[foundIndex][1], segments[foundIndex][0]]);
     } else {
