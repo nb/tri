@@ -418,8 +418,6 @@ function next(segments) {
     );
   });
   if (false === newPoint) {
-    setTimeout(() => next(segments), 0);
-    return;
     const firstConcave = firstConcaveEdge(segments);
     if (false !== firstConcave) {
       const afterConcave = (firstConcave + 1) % segments.length;
