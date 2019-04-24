@@ -394,12 +394,18 @@ function isPointAloneOnItsSide(point, startSegment, segments) {
   return true;
 }
 
+function replaceSideWithNewPoint(segmentIndex, point, segments) {
+  const newSegment0 = [segments[segmentIndex][0], point];
+  const newSegment1 = [point, segments[segmentIndex][1]];
+  segments.splice(segmentIndex, 1, newSegment0, newSegment1);
+  drawSegment(newSegment0);
+  drawSegment(newSegment1);
+  return segments;
+}
+
 function next(segments) {
-  if (shouldStop) {
-    return;
-  }
   attempts++;
-  if (attempts > MAX_ATTEMPTS) {
+  if (shouldStop || attempts > MAX_ATTEMPTS) {
     return;
   }
   // random segment
@@ -426,12 +432,7 @@ function next(segments) {
     setTimeout(() => next(segments), 0);
     return;
   }
-
-  const newSegment0 = [startSegment[0], newPoint];
-  const newSegment1 = [newPoint, startSegment[1]];
-  segments.splice(segmentIndex, 1, newSegment0, newSegment1);
-  drawSegment(newSegment0);
-  drawSegment(newSegment1);
+  segments = replaceSideWithNewPoint(segmentIndex, newPoint, segments);
   setTimeout(() => next(segments), DELAY);
 }
 
