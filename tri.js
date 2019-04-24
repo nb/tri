@@ -66,8 +66,7 @@ function randomPointCloseToASegment(segment, predicate = point => true) {
   ctx.fillStyle = "green";
   ctx.fillRect(middle.x, middle.y, 3, 3);
   */
-  const equiHeight = (Math.sqrt(3) * segmentLength(segment)) / 2;
-  let distance = getRandomInt(0.9 * equiHeight, 1.1 * equiHeight);
+  let distance = getRandomInt(LINE_LENGTH_MIN, LINE_LENGTH_MAX);
   do {
     pointAttempts++;
     if (pointAttempts > 100) return false;
