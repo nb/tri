@@ -314,6 +314,8 @@ function next(segments) {
   for (const concaveIndex of concaveIndices) {
     const afterConcave = (concaveIndex + 1) % segments.length;
     const segment = [segments[concaveIndex][0], segments[afterConcave][1]];
+    // TODO: also limit the angle – if it's too big, even if the resulting
+    // segment is short it's quite ugly
     if (segmentLength(segment) <= MAX_CONCAVE_FILL_LENGTH) {
       drawSegment(segment);
       segments[concaveIndex][1] = segments[afterConcave][1];
