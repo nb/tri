@@ -2,7 +2,7 @@ const GRID_SIZE = 1000;
 const LINE_LENGTH_MIN = 20;
 const LINE_LENGTH_MAX = 50;
 const DELAY = 200;
-const MAX_ATTEMPTS = 1000000;
+const MAX_ATTEMPTS = 1000;
 const MAX_CONCAVE_FILL_LENGTH = 2 * LINE_LENGTH_MAX;
 
 const canvas = document.getElementById("canvas");
