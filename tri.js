@@ -331,6 +331,10 @@ function next(segments) {
       !doesNewTriangleOverlapWithPolygon(point, segmentIndex, segments)
     );
   });
+  if (false === newPoint) {
+    setTimeout(() => next(segments), 0);
+    return;
+  }
   segments = replaceSideWithNewPoint(segmentIndex, newPoint, segments);
   setTimeout(() => next(segments), DELAY);
 }
