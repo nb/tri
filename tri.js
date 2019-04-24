@@ -265,28 +265,6 @@ function middleOfASegment(segment) {
   };
 }
 
-function isPointAloneOnItsSide(point, startSegment, segments) {
-  const newPointOrientation = orientation(startSegment, point);
-  for (const segment of segments) {
-    if (orientation(segment, point) === 0) {
-      console.log("New point is on a segment.", newPoint, segment);
-      return false;
-    }
-    if (
-      orientation(startSegment, segment[0]) * newPointOrientation === 1 ||
-      orientation(startSegment, segment[1]) * newPointOrientation === 1
-    ) {
-      console.log(
-        "New point is on the same side of the chosen segment with another point",
-        point,
-        segment
-      );
-      return false;
-    }
-  }
-  return true;
-}
-
 function replaceSideWithNewPoint(segmentIndex, point, segments) {
   const newSegment0 = [segments[segmentIndex][0], point];
   const newSegment1 = [point, segments[segmentIndex][1]];
@@ -294,6 +272,31 @@ function replaceSideWithNewPoint(segmentIndex, point, segments) {
   drawSegment(newSegment0);
   drawSegment(newSegment1);
   return segments;
+}
+
+function doesNewTriangleOverlapWithPolygon(point, segmentIndex, segments) {
+  const newSegments = [
+    [segments[segmentIndex][0], point],
+    [point, segments[segmentIndex][1]]
+  ];
+  for (let i = 0; i < segments.length; i++) {
+    if (i === segmentIndex) {
+      continue;
+    }
+    if (
+      i !== (segmentIndex - 1 + segments.length) % segments.length &&
+      doSegmentsCross(newSegments[0], segments[i])
+    ) {
+      return true;
+    }
+    if (
+      i !== (segmentIndex + 1) % segments.length &&
+      doSegmentsCross(newSegments[1], segments[i])
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function next(segments) {
@@ -307,7 +310,7 @@ function next(segments) {
   const newPoint = randomPointCloseToASegment(startSegment, point => {
     return (
       !isPointInsidePolygon(point, segments) &&
-      isPointAloneOnItsSide(point, startSegment, segments)
+      !doesNewTriangleOverlapWithPolygon(point, segmentIndex, segments)
     );
   });
   if (false === newPoint) {
