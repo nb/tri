@@ -79,10 +79,6 @@ function randomPointCloseToASegment(segment, predicate = point => true) {
       x: Math.floor(middle.x + sign * offsetX),
       y: Math.floor(middle.y + sign * offsetY)
     };
-    /*
-    ctx.fillStyle = "red";
-    ctx.fillRect(newPoint.x, newPoint.y, 3, 3);
-    */
     distance = distance / 1.1;
     sign = -sign;
   } while (
