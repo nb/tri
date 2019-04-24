@@ -333,12 +333,6 @@ document.onkeydown = function(event) {
   }
 };
 
-const triangle = [
-  [{ x: 741, y: 380 }, { x: 300, y: 572 }],
-  [{ x: 741, y: 380 }, { x: 741, y: 963 }],
-  [{ x: 300, y: 572 }, { x: 741, y: 963 }]
-];
-//const initialSegments = orderSegments(triangle);
 const initialSegments = orderSegments(randomTriangle());
 initialSegments.forEach(drawSegment);
 next(initialSegments);
