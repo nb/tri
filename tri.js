@@ -108,6 +108,22 @@ function segmentLength(segment) {
   );
 }
 
+function angleBetweenSegments(s0, s1) {
+  const angleSegment0 = Math.atan2(s0[0].y - s0[1].y, s0[0].x - s0[1].x);
+  const angleSegment1 = Math.atan2(s1[0].y - s1[1].y, s1[0].x - s1[1].x);
+  let diff = ((angleSegment0 - angleSegment1) / Math.PI) * 180;
+  const o = orientation(s0, s1[1]);
+  // these edge cases are purely empirical
+  if (1 === o) {
+    if (diff < -180) diff = 360 + diff;
+    if (diff > 0 && diff < 180) diff = 180 - diff;
+  } else if (-1 === o) {
+    if (diff < 0) diff += 180;
+    if (diff > 180) diff -= 180;
+  }
+  return diff;
+}
+
 /**
  * Orientation of three points – a segment and one more point
  * 0: colinear, 1: clock wise, 1: counterclockwise (or vice versa, whatever…)
@@ -314,9 +330,11 @@ function next(segments) {
   for (const concaveIndex of concaveIndices) {
     const afterConcave = (concaveIndex + 1) % segments.length;
     const segment = [segments[concaveIndex][0], segments[afterConcave][1]];
-    // TODO: also limit the angle – if it's too big, even if the resulting
-    // segment is short it's quite ugly
-    if (segmentLength(segment) <= MAX_CONCAVE_FILL_LENGTH) {
+    if (
+      angleBetweenSegments(segments[concaveIndex], segments[afterConcave]) <
+        120 &&
+      segmentLength(segment) <= MAX_CONCAVE_FILL_LENGTH
+    ) {
       drawSegment(segment);
       segments[concaveIndex][1] = segments[afterConcave][1];
       segments.splice(afterConcave, 1);
